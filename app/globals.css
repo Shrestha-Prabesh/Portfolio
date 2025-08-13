@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1px white;
+}
+
+@media (min-width: 768px) {
+  .text-stroke {
+    -webkit-text-stroke: 2px white;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: rgb(168 85 247 / 0.2);
+  color: white;
+}
+
+.floating-shape {
+  will-change: transform;
+}
+

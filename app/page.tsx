@@ -1,0 +1,797 @@
+"use client"
+
+import type React from "react"
+
+import { useEffect, useRef, useState } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { ArrowRight, Code2, Database, Cpu, Code, ArrowLeft } from "lucide-react"
+import RippleTransition from "./components/RippleTransition"
+import ProjectDetail from "./components/ProjectDetail"
+import InitializationScreen from "./components/InitializationScreen"
+import ContactForm from "./components/ContactForm"
+
+gsap.registerPlugin(ScrollTrigger)
+
+interface ProjectClickPosition {
+  x: number
+  y: number
+}
+
+interface CompanyWork {
+  id: string
+  title: string
+  description: string
+  image?: string
+  category: string
+}
+
+interface Company {
+  name: string
+  description: string
+  works: CompanyWork[]
+}
+
+export default function Home() {
+  const [selectedProject, setSelectedProject] = useState<{
+    title: string
+    description: string
+    year: string
+    link?: string
+    images?: string[]
+  } | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [clickPosition, setClickPosition] = useState<ProjectClickPosition>({ x: 0, y: 0 })
+  const [isClosing, setIsClosing] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
+  const [expandedCompany, setExpandedCompany] = useState<string | null>(null)
+  const [isDesignAnimating, setIsDesignAnimating] = useState(false)
+  const containerRef = useRef(null)
+  const headingRef = useRef(null)
+  const subheadingRef = useRef(null)
+  const sectionRefs = useRef<(HTMLElement | null)[]>([])
+  const [isSpoilerOpen, setIsSpoilerOpen] = useState(false)
+  const designSectionRef = useRef<HTMLDivElement>(null)
+  const particleContainerRef = useRef<HTMLDivElement>(null)
+
+  const companies: Company[] = [
+    {
+      name: "AirCharge",
+      description: "Created social media content for Instagram and Facebook using Canva and Adobe Illustrator",
+      works: [
+        {
+          id: "ac1",
+          title: "Instagram Story Templates",
+          description: "Designed engaging story templates for product promotions and brand awareness campaigns",
+          image: "/aircharge-instagram-story.png",
+          category: "Social Media",
+        },
+        {
+          id: "ac2",
+          title: "Facebook Ad Campaigns",
+          description: "Created compelling ad visuals for Facebook marketing campaigns targeting tech enthusiasts",
+          image: "/placeholder-hzy7s.png",
+          category: "Advertising",
+        },
+        {
+          id: "ac3",
+          title: "Product Showcase Posts",
+          description: "Designed clean and modern product showcase posts highlighting AirCharge features",
+          image: "/wireless-charger-showcase.png",
+          category: "Product Design",
+        },
+        {
+          id: "ac4",
+          title: "Brand Identity Elements",
+          description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
+          image: "/tech-brand-identity.png",
+          category: "Branding",
+        },
+      ],
+    },
+    {
+      name: "Avani Nepal",
+      description: "Created product magazines, social media posts and brochures using Canva and Adobe Illustrator",
+      works: [
+        {
+          id: "an1",
+          title: "Product Magazine Layout",
+          description:
+            "Designed comprehensive product catalogs showcasing Avani Nepal's offerings with elegant layouts",
+          image: "/avani-nepal-magazine-layout.png",
+          category: "Print Design",
+        },
+        {
+          id: "an2",
+          title: "Social Media Campaign",
+          description: "Created cohesive social media posts for Instagram and Facebook promoting Avani Nepal products",
+          image: "/avani-nepal-social-post.png",
+          category: "Social Media",
+        },
+        {
+          id: "an3",
+          title: "Marketing Brochures",
+          description: "Designed informative brochures highlighting product features and company values",
+          image: "/avani-nepal-brochure.png",
+          category: "Print Design",
+        },
+        {
+          id: "an4",
+          title: "Digital Advertisements",
+          description: "Created eye-catching digital ads for online platforms and email marketing campaigns",
+          image: "/avani-nepal-digital-ad.png",
+          category: "Digital Marketing",
+        },
+      ],
+    },
+    {
+      name: "The Bright College",
+      description:
+        "Designed booklets, brochures, and social media posts using Canva and Adobe Illustrator to support the college's marketing efforts",
+      works: [
+        {
+          id: "tbc1",
+          title: "College Admission Booklet",
+          description: "Designed comprehensive admission booklets with course information and campus highlights",
+          image: "/bright-college-booklet.png",
+          category: "Educational Design",
+        },
+        {
+          id: "tbc2",
+          title: "Event Promotion Materials",
+          description: "Created promotional materials for college events, seminars, and workshops",
+          image: "/placeholder-abg5e.png",
+          category: "Event Design",
+        },
+        {
+          id: "tbc3",
+          title: "Social Media Content",
+          description: "Designed engaging social media posts for student recruitment and college updates",
+          image: "/placeholder.svg?height=300&width=400",
+          category: "Social Media",
+        },
+        {
+          id: "tbc4",
+          title: "Academic Brochures",
+          description: "Created informative brochures for different academic programs and departments",
+          image: "/placeholder.svg?height=300&width=400",
+          category: "Educational Design",
+        },
+      ],
+    },
+  ]
+
+  const toggleSpoiler = () => {
+    setIsSpoilerOpen(!isSpoilerOpen)
+  }
+
+  const handleCompanyClick = (companyName: string, buttonElement: HTMLElement) => {
+    if (isDesignAnimating) return
+
+    setIsDesignAnimating(true)
+
+    createParticleBurst(buttonElement)
+    createRippleWaves(buttonElement)
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setExpandedCompany(companyName)
+        setIsDesignAnimating(false)
+      },
+    })
+
+    tl.to(buttonElement, {
+      scale: 1.5,
+      rotation: 180,
+      duration: 0.3,
+      ease: "back.out(2)",
+    }).to(buttonElement, {
+      scale: 0,
+      duration: 0.2,
+      ease: "power2.in",
+    })
+
+    const companyItems = designSectionRef.current?.querySelectorAll(".company-item")
+    if (companyItems) {
+      companyItems.forEach((item, index) => {
+        gsap.to(item, {
+          x: index % 2 === 0 ? -200 : 200,
+          y: -100,
+          rotation: index % 2 === 0 ? -15 : 15,
+          opacity: 0,
+          scale: 0.8,
+          duration: 0.6,
+          delay: index * 0.1,
+          ease: "power2.in",
+        })
+      })
+    }
+
+    const titleElement = designSectionRef.current?.querySelector("h2")
+    if (titleElement) {
+      gsap.to(titleElement, {
+        y: -50,
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.in",
+      })
+    }
+  }
+
+  const handleBackToCompanies = () => {
+    if (isDesignAnimating) return
+
+    setIsDesignAnimating(true)
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setExpandedCompany(null)
+        setIsDesignAnimating(false)
+      },
+    })
+
+    const portfolioItems = designSectionRef.current?.querySelectorAll(".portfolio-item")
+    if (portfolioItems) {
+      portfolioItems.forEach((item, index) => {
+        gsap.to(item, {
+          y: 100,
+          opacity: 0,
+          scale: 0.8,
+          rotation: Math.random() * 20 - 10,
+          duration: 0.4,
+          delay: index * 0.05,
+          ease: "power2.in",
+        })
+      })
+    }
+
+    tl.call(
+      () => {
+        setExpandedCompany(null)
+      },
+      [],
+      0.5,
+    ).from(
+      ".company-item",
+      {
+        x: (index) => (index % 2 === 0 ? -200 : 200),
+        y: -100,
+        rotation: (index) => (index % 2 === 0 ? -15 : 15),
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.8,
+        delay: 0.1,
+        stagger: 0.1,
+        ease: "elastic.out(1, 0.5)",
+      },
+      0.6,
+    )
+  }
+
+  const createParticleBurst = (buttonElement: HTMLElement) => {
+    const rect = buttonElement.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    for (let i = 0; i < 12; i++) {
+      const particle = document.createElement("div")
+      particle.className = "particle-burst"
+      particle.style.cssText = `
+        position: fixed;
+        width: 4px;
+        height: 4px;
+        background: linear-gradient(45deg, #a855f7, #ec4899);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 1000;
+        left: ${centerX}px;
+        top: ${centerY}px;
+      `
+
+      document.body.appendChild(particle)
+
+      const angle = (i / 12) * Math.PI * 2
+      const distance = 100 + Math.random() * 50
+      const endX = centerX + Math.cos(angle) * distance
+      const endY = centerY + Math.sin(angle) * distance
+
+      gsap.to(particle, {
+        x: endX - centerX,
+        y: endY - centerY,
+        scale: 0,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        onComplete: () => {
+          document.body.removeChild(particle)
+        },
+      })
+    }
+  }
+
+  const createRippleWaves = (buttonElement: HTMLElement) => {
+    const rect = buttonElement.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    for (let i = 0; i < 3; i++) {
+      const ripple = document.createElement("div")
+      ripple.className = "ripple-wave"
+      ripple.style.cssText = `
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(168, 85, 247, 0.6);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 999;
+        left: ${centerX - 10}px;
+        top: ${centerY - 10}px;
+      `
+
+      document.body.appendChild(ripple)
+
+      gsap.to(ripple, {
+        width: 200,
+        height: 200,
+        left: centerX - 100,
+        top: centerY - 100,
+        opacity: 0,
+        duration: 1.2,
+        delay: i * 0.2,
+        ease: "power2.out",
+        onComplete: () => {
+          document.body.removeChild(ripple)
+        },
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (!isInitializing) {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+
+      tl.from(headingRef.current, {
+        y: 100,
+        opacity: 0,
+        duration: 1.2,
+      }).from(
+        subheadingRef.current,
+        {
+          y: 50,
+          opacity: 0,
+          duration: 1,
+        },
+        "-=0.8",
+      )
+
+      gsap.to(".floating-shape", {
+        y: "20px",
+        rotation: 5,
+        duration: 2,
+        yoyo: true,
+        repeat: -1,
+        ease: "power1.inOut",
+        stagger: {
+          each: 0.2,
+          from: "random",
+        },
+      })
+
+      sectionRefs.current.forEach((section) => {
+        gsap.from(section, {
+          opacity: 0,
+          y: 50,
+          duration: 1,
+          scrollTrigger: {
+            trigger: section,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse",
+          },
+        })
+      })
+    }
+  }, [isInitializing])
+
+  const handleProjectClick = (
+    e: React.MouseEvent,
+    project: {
+      title: string
+      description: string
+      year: string
+      link?: string
+      images?: string[]
+      x: number
+      y: number
+    },
+  ) => {
+    setClickPosition({ x: project.x, y: project.y })
+    setIsTransitioning(true)
+
+    setSelectedProject(project)
+
+    setTimeout(() => {
+      setIsTransitioning(false)
+    }, 200)
+  }
+
+  const handleCloseProject = () => {
+    setIsClosing(true)
+    setTimeout(() => {
+      setSelectedProject(null)
+      setIsClosing(false)
+    }, 1000)
+  }
+
+  const handleInitializationComplete = () => {
+    setIsInitializing(false)
+  }
+
+  if (isInitializing) {
+    return <InitializationScreen onComplete={handleInitializationComplete} />
+  }
+
+  return (
+    <main className="bg-black min-h-screen text-white" ref={containerRef}>
+      <div ref={particleContainerRef} className="fixed inset-0 pointer-events-none z-50" />
+
+      <section className="min-h-screen flex items-center relative overflow-hidden px-4 md:px-8 lg:px-16">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="floating-shape absolute top-[20%] right-[10%] w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
+          <div className="floating-shape absolute top-[40%] left-[15%] w-48 h-48 bg-purple-600/10 rounded-full blur-3xl"></div>
+          <div className="floating-shape absolute bottom-[20%] right-[20%] w-56 h-56 bg-purple-700/10 rounded-full blur-3xl"></div>
+          <svg className="absolute top-0 right-0 w-1/2 h-full opacity-20" viewBox="0 0 200 200">
+            <path
+              fill="rgb(168 85 247 / 0.2)"
+              d="M37.5,-64.1C48.3,-56.9,56.6,-45.8,65.1,-33.5C73.5,-21.2,82.1,-7.7,81.9,5.8C81.7,19.3,72.8,32.8,62.4,43.2C52,53.6,40.1,60.9,27.2,65.3C14.3,69.7,0.4,71.1,-14.8,69.7C-30,68.3,-46.5,64,-57.8,53.9C-69.1,43.8,-75.2,27.9,-77.7,11.3C-80.2,-5.3,-79.1,-22.7,-71.6,-36.3C-64.1,-49.9,-50.2,-59.8,-36.3,-65.5C-22.4,-71.2,-8.5,-72.8,2.7,-77.1C13.8,-81.3,27.7,-88.3,37.5,-64.1Z"
+              transform="translate(100 100)"
+            />
+          </svg>
+        </div>
+
+        <div className="w-full max-w-[1400px] mx-auto">
+          <div className="max-w-3xl">
+            <h1 ref={headingRef} className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8">
+              <span className="block">I craft</span>
+              <span className="block text-stroke text-transparent">Digital Experiences</span>
+              <span className="block">& Visual Stories</span>
+            </h1>
+            <p ref={subheadingRef} className="text-xl md:text-2xl text-gray-400 max-w-2xl">
+              Frontend Developer & Graphic Designer creating seamless digital experiences through code and creative
+              design
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        ref={(el) => {
+          sectionRefs.current[0] = el
+        }}
+        className="min-h-screen px-4 md:px-8 lg:px-16"
+      >
+        <div className="w-full max-w-[1400px] mx-auto">
+          <h2 className="text-4xl md:text-6xl font-bold mb-4">Skill-Set</h2>
+          <div className="h-1 w-24 bg-purple-500 mb-16"></div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <SkillCard
+              icon={<Code2 className="w-8 h-8 text-purple-500" />}
+              title="Frontend Development"
+              description="Developing responsive and high-performance user interfaces with React, Next.js, and modern web standards."
+            />
+            <SkillCard
+              icon={<Database className="w-8 h-8 text-purple-500" />}
+              title="Graphic & UI/UX Design"
+              description="Designing visually appealing and user-friendly interfaces with tools like Adobe Photoshop, Illustrator, Figma, and Canva."
+            />
+            <SkillCard
+              icon={<Cpu className="w-8 h-8 text-purple-500" />}
+              title="Responsive Design"
+              description="Creating mobile-friendly layouts with Flexbox, CSS Grid, and Tailwind CSS to ensure compatibility across devices."
+            />
+            <SkillCard
+              icon={<Code className="w-8 h-8 text-purple-500" />}
+              title="Collaborative Design"
+              description="Working with design tools like Figma to create and implement modern, developer-friendly UI components."
+            />
+          </div>
+        </div>
+      </section>
+
+      <section
+        ref={(el) => {
+          sectionRefs.current[1] = el
+        }}
+        className="min-h-screen flex items-center px-4 md:px-8 lg:px-16"
+      >
+        <div className="w-full max-w-[1400px] mx-auto">
+          <h2 className="text-4xl md:text-6xl font-bold mb-16">My Works</h2>
+          <div className="grid gap-8">
+            <WorkItem
+              title="Shreya Auto"
+              description="Developed as my university final year project. A comprehensive platform for vehicle reconditioning, including buying, selling, renting, and lost & found features, with Google login and Khalti payment integration."
+              year="2025"
+              link="https://github.com/Shrestha-Prabesh/ShreyaAuto"
+              onClick={handleProjectClick}
+            />
+            <WorkItem
+              title="Hiss & Hunt"
+              description="An interactive snake game built using JavaScript, featuring smooth animations and dynamic scoring"
+              year="2024"
+              onClick={handleProjectClick}
+              link="https://hissandhuntbyprabesh.netlify.app"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section
+        ref={(el) => {
+          sectionRefs.current[2] = el
+          designSectionRef.current = el
+        }}
+        className="min-h-screen flex items-center px-4 md:px-8 lg:px-16"
+      >
+        <div className="w-full max-w-[1400px] mx-auto">
+          {!expandedCompany ? (
+            <>
+              <h2 className="text-4xl md:text-6xl font-bold mb-16">My Designs</h2>
+              <div className="grid gap-8">
+                {companies.map((company) => (
+                  <CompanyItem
+                    key={company.name}
+                    title={company.name}
+                    description={company.description}
+                    onClick={(companyName) => {
+                      const button = document.querySelector(`[data-company="${companyName}"]`) as HTMLElement
+                      if (button) {
+                        handleCompanyClick(companyName, button)
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <CompanyPortfolio
+              company={companies.find((c) => c.name === expandedCompany)!}
+              onBack={handleBackToCompanies}
+            />
+          )}
+        </div>
+      </section>
+
+      <section
+        ref={(el) => {
+          sectionRefs.current[3] = el
+        }}
+        className="min-h-screen flex items-center px-4 md:px-8 lg:px-16 py-20"
+      >
+        <div className="w-full max-w-[1400px] mx-auto">
+          <h2 className="text-4xl md:text-6xl font-bold mb-16">About</h2>
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className="space-y-6">
+              <div className="space-y-6 text-xl text-gray-400">
+                <p>
+                  I design with the eye of an artist and develop with the mind of an engineer, so the web gets the best
+                  of both worlds.{" "}
+                  <span
+                    onClick={toggleSpoiler}
+                    className={`cursor-pointer inline-block px-2 py-1 rounded-md ${
+                      isSpoilerOpen ? "bg-transparent text-white" : "bg-gray-600 text-transparent"
+                    }`}
+                    style={{
+                      width: isSpoilerOpen ? "auto" : "120px",
+                      height: "20px",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {isSpoilerOpen ? "it never does" : ""}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <ContactForm />
+          </div>
+        </div>
+      </section>
+
+      <RippleTransition
+        isActive={isTransitioning || isClosing || !!selectedProject}
+        isClosing={isClosing}
+        x={clickPosition.x}
+        y={clickPosition.y}
+      />
+
+      {selectedProject && (
+        <ProjectDetail
+          {...selectedProject}
+          onClose={handleCloseProject}
+          isVisible={!isTransitioning && !isClosing}
+          isClosing={isClosing}
+        />
+      )}
+    </main>
+  )
+}
+
+function SkillCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+  return (
+    <div className="group p-8 rounded-lg bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-purple-500/50 transition-colors">
+      <div className="mb-4">{icon}</div>
+      <h3 className="text-xl font-bold mb-2">{title}</h3>
+      <p className="text-gray-400">{description}</p>
+    </div>
+  )
+}
+
+function WorkItem({
+  title,
+  description,
+  year,
+  onClick,
+  link,
+  images,
+}: {
+  title: string
+  description: string
+  year: string
+  link?: string
+  images?: string[]
+  onClick: (
+    e: React.MouseEvent,
+    project: {
+      title: string
+      description: string
+      year: string
+      link?: string
+      images?: string[]
+      x: number
+      y: number
+    },
+  ) => void
+}) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const target = e.currentTarget
+    const rect = target.getBoundingClientRect()
+    const x = rect.right
+    const y = rect.top + rect.height / 2
+    onClick(e, { title, description, link, images, year, x, y })
+  }
+
+  return (
+    <div className="group border-t border-gray-800 py-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl md:text-3xl font-bold mb-2">{title}</h3>
+          <p className="text-gray-400">{description}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-500">{year}</span>
+          <button
+            onClick={handleClick}
+            className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center hover:bg-purple-600 transition-colors"
+          >
+            <ArrowRight className="w-6 h-6 text-white" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CompanyItem({
+  title,
+  description,
+  onClick,
+}: {
+  title: string
+  description: string
+  onClick: (companyName: string) => void
+}) {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    onClick(title)
+  }
+
+  return (
+    <div className="company-item group border-t border-gray-800 py-8">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <h3 className="text-2xl md:text-3xl font-bold mb-2">{title}</h3>
+          <p className="text-gray-400">{description}</p>
+        </div>
+        <button
+          ref={buttonRef}
+          data-company={title}
+          onClick={handleClick}
+          className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center hover:bg-purple-600 transition-all duration-300 group-hover:scale-110 transform relative overflow-hidden"
+        >
+          <ArrowRight className="w-6 h-6 text-white transition-transform duration-300 group-hover:translate-x-1" />
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-full"></div>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function CompanyPortfolio({ company, onBack }: { company: Company; onBack: () => void }) {
+  const portfolioRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const items = portfolioRef.current?.querySelectorAll(".portfolio-item")
+    if (items) {
+      gsap.fromTo(
+        items,
+        {
+          y: 100,
+          opacity: 0,
+          scale: 0.8,
+          rotation: (index) => Math.random() * 20 - 10,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          rotation: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "elastic.out(1, 0.5)",
+        },
+      )
+    }
+
+    const header = portfolioRef.current?.querySelector(".portfolio-header")
+    if (header) {
+      gsap.fromTo(header, { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" })
+    }
+  }, [])
+
+  return (
+    <div ref={portfolioRef} className="space-y-8">
+      <div className="portfolio-header flex items-center gap-4 mb-8">
+        <button
+          onClick={onBack}
+          className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition-all duration-300 hover:scale-110 transform"
+        >
+          <ArrowLeft className="w-6 h-6 text-white" />
+        </button>
+        <div>
+          <h2 className="text-4xl md:text-6xl font-bold">{company.name}</h2>
+          <p className="text-gray-400 mt-2">{company.description}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        {company.works.map((work, index) => (
+          <div
+            key={work.id}
+            className="portfolio-item group bg-gray-900/50 rounded-lg overflow-hidden border border-gray-800 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 transform"
+          >
+            <div className="aspect-video overflow-hidden">
+              <img
+                src={work.image || "/placeholder.svg"}
+                alt={work.title}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+            </div>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-purple-400 font-medium">{work.category}</span>
+              </div>
+              <h3 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors duration-300">
+                {work.title}
+              </h3>
+              <p className="text-gray-400 text-sm leading-relaxed">{work.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
