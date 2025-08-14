@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Github, Linkedin } from 'lucide-react'
-import emailjs from 'emailjs-com'
 
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -13,26 +12,39 @@ export default function ContactForm() {
     setIsSubmitting(true)
 
     const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
     
-    // Send email using EmailJS
+    // Extract form data
+    const data = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      message: formData.get('message') as string,
+    }
+
     try {
-      // Replace with your actual EmailJS user ID
-      const userID = '7e0STKFisqwxBY29E'; 
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
 
-      // Pass the form element instead of FormData
-      const response = await emailjs.sendForm(
-        'service_6vj3djo', // Replace with your service ID
-        'template_bymvhmd', // Replace with your template ID
-        form, // Pass the form element here
-        userID // Replace with your user ID from EmailJS
-      )
-
-      console.log('Email sent successfully:', response)
-      setIsSubmitting(false)
-      setIsSubmitted(true)
+      if (response.ok) {
+        console.log('Email sent successfully')
+        setIsSubmitting(false)
+        setIsSubmitted(true)
+        form.reset() // Clear the form
+      } else {
+        const errorData = await response.json()
+        console.error('Error sending email:', errorData.error)
+        setIsSubmitting(false)
+        alert('Failed to send message. Please try again.')
+      }
     } catch (error) {
       console.error('Error sending email:', error)
       setIsSubmitting(false)
+      alert('Failed to send message. Please try again.')
     }
   }
 

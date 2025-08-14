@@ -8,8 +8,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ArrowRight, Code2, Database, Cpu, Code, ArrowLeft } from "lucide-react"
 import RippleTransition from "./components/RippleTransition"
 import ProjectDetail from "./components/ProjectDetail"
+import CompanyDetail from "./components/CompanyDetail"
 import InitializationScreen from "./components/InitializationScreen"
 import ContactForm from "./components/ContactForm"
+import CircularGallery from "./components/CircularGallery"
+import Test1 from "../public/test.png"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -40,18 +43,16 @@ export default function Home() {
     link?: string
     images?: string[]
   } | null>(null)
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [clickPosition, setClickPosition] = useState<ProjectClickPosition>({ x: 0, y: 0 })
   const [isClosing, setIsClosing] = useState(false)
   const [isInitializing, setIsInitializing] = useState(true)
-  const [expandedCompany, setExpandedCompany] = useState<string | null>(null)
-  const [isDesignAnimating, setIsDesignAnimating] = useState(false)
   const containerRef = useRef(null)
   const headingRef = useRef(null)
   const subheadingRef = useRef(null)
   const sectionRefs = useRef<(HTMLElement | null)[]>([])
   const [isSpoilerOpen, setIsSpoilerOpen] = useState(false)
-  const designSectionRef = useRef<HTMLDivElement>(null)
   const particleContainerRef = useRef<HTMLDivElement>(null)
 
   const companies: Company[] = [
@@ -63,28 +64,28 @@ export default function Home() {
           id: "ac1",
           title: "Instagram Story Templates",
           description: "Designed engaging story templates for product promotions and brand awareness campaigns",
-          image: "/aircharge-instagram-story.png",
+          image: "/test.png",
           category: "Social Media",
         },
         {
           id: "ac2",
           title: "Facebook Ad Campaigns",
           description: "Created compelling ad visuals for Facebook marketing campaigns targeting tech enthusiasts",
-          image: "/placeholder-hzy7s.png",
+          image: "/test.png",
           category: "Advertising",
         },
         {
           id: "ac3",
           title: "Product Showcase Posts",
           description: "Designed clean and modern product showcase posts highlighting AirCharge features",
-          image: "/wireless-charger-showcase.png",
+          image: "/test.png",
           category: "Product Design",
         },
         {
           id: "ac4",
           title: "Brand Identity Elements",
           description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
-          image: "/tech-brand-identity.png",
+         image: "/test.png",
           category: "Branding",
         },
       ],
@@ -98,7 +99,7 @@ export default function Home() {
           title: "Product Magazine Layout",
           description:
             "Designed comprehensive product catalogs showcasing Avani Nepal's offerings with elegant layouts",
-          image: "/avani-nepal-magazine-layout.png",
+          image: "/page.png",
           category: "Print Design",
         },
         {
@@ -165,186 +166,30 @@ export default function Home() {
     setIsSpoilerOpen(!isSpoilerOpen)
   }
 
-  const handleCompanyClick = (companyName: string, buttonElement: HTMLElement) => {
-    if (isDesignAnimating) return
+  const handleCompanyClick = (
+    e: React.MouseEvent,
+    company: Company
+  ) => {
+    const target = e.currentTarget
+    const rect = target.getBoundingClientRect()
+    const x = rect.right
+    const y = rect.top + rect.height / 2
+    
+    setClickPosition({ x, y })
+    setIsTransitioning(true)
+    setSelectedCompany(company)
 
-    setIsDesignAnimating(true)
-
-    createParticleBurst(buttonElement)
-    createRippleWaves(buttonElement)
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setExpandedCompany(companyName)
-        setIsDesignAnimating(false)
-      },
-    })
-
-    tl.to(buttonElement, {
-      scale: 1.5,
-      rotation: 180,
-      duration: 0.3,
-      ease: "back.out(2)",
-    }).to(buttonElement, {
-      scale: 0,
-      duration: 0.2,
-      ease: "power2.in",
-    })
-
-    const companyItems = designSectionRef.current?.querySelectorAll(".company-item")
-    if (companyItems) {
-      companyItems.forEach((item, index) => {
-        gsap.to(item, {
-          x: index % 2 === 0 ? -200 : 200,
-          y: -100,
-          rotation: index % 2 === 0 ? -15 : 15,
-          opacity: 0,
-          scale: 0.8,
-          duration: 0.6,
-          delay: index * 0.1,
-          ease: "power2.in",
-        })
-      })
-    }
-
-    const titleElement = designSectionRef.current?.querySelector("h2")
-    if (titleElement) {
-      gsap.to(titleElement, {
-        y: -50,
-        opacity: 0,
-        duration: 0.5,
-        ease: "power2.in",
-      })
-    }
+    setTimeout(() => {
+      setIsTransitioning(false)
+    }, 200)
   }
 
-  const handleBackToCompanies = () => {
-    if (isDesignAnimating) return
-
-    setIsDesignAnimating(true)
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setExpandedCompany(null)
-        setIsDesignAnimating(false)
-      },
-    })
-
-    const portfolioItems = designSectionRef.current?.querySelectorAll(".portfolio-item")
-    if (portfolioItems) {
-      portfolioItems.forEach((item, index) => {
-        gsap.to(item, {
-          y: 100,
-          opacity: 0,
-          scale: 0.8,
-          rotation: Math.random() * 20 - 10,
-          duration: 0.4,
-          delay: index * 0.05,
-          ease: "power2.in",
-        })
-      })
-    }
-
-    tl.call(
-      () => {
-        setExpandedCompany(null)
-      },
-      [],
-      0.5,
-    ).from(
-      ".company-item",
-      {
-        x: (index) => (index % 2 === 0 ? -200 : 200),
-        y: -100,
-        rotation: (index) => (index % 2 === 0 ? -15 : 15),
-        opacity: 0,
-        scale: 0.8,
-        duration: 0.8,
-        delay: 0.1,
-        stagger: 0.1,
-        ease: "elastic.out(1, 0.5)",
-      },
-      0.6,
-    )
-  }
-
-  const createParticleBurst = (buttonElement: HTMLElement) => {
-    const rect = buttonElement.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-
-    for (let i = 0; i < 12; i++) {
-      const particle = document.createElement("div")
-      particle.className = "particle-burst"
-      particle.style.cssText = `
-        position: fixed;
-        width: 4px;
-        height: 4px;
-        background: linear-gradient(45deg, #a855f7, #ec4899);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 1000;
-        left: ${centerX}px;
-        top: ${centerY}px;
-      `
-
-      document.body.appendChild(particle)
-
-      const angle = (i / 12) * Math.PI * 2
-      const distance = 100 + Math.random() * 50
-      const endX = centerX + Math.cos(angle) * distance
-      const endY = centerY + Math.sin(angle) * distance
-
-      gsap.to(particle, {
-        x: endX - centerX,
-        y: endY - centerY,
-        scale: 0,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power2.out",
-        onComplete: () => {
-          document.body.removeChild(particle)
-        },
-      })
-    }
-  }
-
-  const createRippleWaves = (buttonElement: HTMLElement) => {
-    const rect = buttonElement.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-
-    for (let i = 0; i < 3; i++) {
-      const ripple = document.createElement("div")
-      ripple.className = "ripple-wave"
-      ripple.style.cssText = `
-        position: fixed;
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(168, 85, 247, 0.6);
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 999;
-        left: ${centerX - 10}px;
-        top: ${centerY - 10}px;
-      `
-
-      document.body.appendChild(ripple)
-
-      gsap.to(ripple, {
-        width: 200,
-        height: 200,
-        left: centerX - 100,
-        top: centerY - 100,
-        opacity: 0,
-        duration: 1.2,
-        delay: i * 0.2,
-        ease: "power2.out",
-        onComplete: () => {
-          document.body.removeChild(ripple)
-        },
-      })
-    }
+  const handleCloseCompany = () => {
+    setIsClosing(true)
+    setTimeout(() => {
+      setSelectedCompany(null)
+      setIsClosing(false)
+    }, 1000)
   }
 
   useEffect(() => {
@@ -530,36 +375,22 @@ export default function Home() {
       <section
         ref={(el) => {
           sectionRefs.current[2] = el
-          designSectionRef.current = el
         }}
         className="min-h-screen flex items-center px-4 md:px-8 lg:px-16"
       >
         <div className="w-full max-w-[1400px] mx-auto">
-          {!expandedCompany ? (
-            <>
-              <h2 className="text-4xl md:text-6xl font-bold mb-16">My Designs</h2>
-              <div className="grid gap-8">
-                {companies.map((company) => (
-                  <CompanyItem
-                    key={company.name}
-                    title={company.name}
-                    description={company.description}
-                    onClick={(companyName) => {
-                      const button = document.querySelector(`[data-company="${companyName}"]`) as HTMLElement
-                      if (button) {
-                        handleCompanyClick(companyName, button)
-                      }
-                    }}
-                  />
-                ))}
-              </div>
-            </>
-          ) : (
-            <CompanyPortfolio
-              company={companies.find((c) => c.name === expandedCompany)!}
-              onBack={handleBackToCompanies}
-            />
-          )}
+          <h2 className="text-4xl md:text-6xl font-bold mb-16">My Designs</h2>
+          <div className="grid gap-8">
+            {companies.map((company) => (
+              <CompanyItem
+                key={company.name}
+                title={company.name}
+                description={company.description}
+                company={company}
+                onClick={handleCompanyClick}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -599,7 +430,7 @@ export default function Home() {
       </section>
 
       <RippleTransition
-        isActive={isTransitioning || isClosing || !!selectedProject}
+        isActive={isTransitioning || isClosing || !!selectedProject || !!selectedCompany}
         isClosing={isClosing}
         x={clickPosition.x}
         y={clickPosition.y}
@@ -609,6 +440,15 @@ export default function Home() {
         <ProjectDetail
           {...selectedProject}
           onClose={handleCloseProject}
+          isVisible={!isTransitioning && !isClosing}
+          isClosing={isClosing}
+        />
+      )}
+
+      {selectedCompany && (
+        <CompanyDetail
+          company={selectedCompany}
+          onClose={handleCloseCompany}
           isVisible={!isTransitioning && !isClosing}
           isClosing={isClosing}
         />
@@ -686,17 +526,17 @@ function WorkItem({
 function CompanyItem({
   title,
   description,
+  company,
   onClick,
 }: {
   title: string
   description: string
-  onClick: (companyName: string) => void
+  company: Company
+  onClick: (e: React.MouseEvent, company: Company) => void
 }) {
-  const buttonRef = useRef<HTMLButtonElement>(null)
-
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    onClick(title)
+    onClick(e, company)
   }
 
   return (
@@ -707,7 +547,6 @@ function CompanyItem({
           <p className="text-gray-400">{description}</p>
         </div>
         <button
-          ref={buttonRef}
           data-company={title}
           onClick={handleClick}
           className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center hover:bg-purple-600 transition-all duration-300 group-hover:scale-110 transform relative overflow-hidden"
@@ -715,82 +554,6 @@ function CompanyItem({
           <ArrowRight className="w-6 h-6 text-white transition-transform duration-300 group-hover:translate-x-1" />
           <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-full"></div>
         </button>
-      </div>
-    </div>
-  )
-}
-
-function CompanyPortfolio({ company, onBack }: { company: Company; onBack: () => void }) {
-  const portfolioRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const items = portfolioRef.current?.querySelectorAll(".portfolio-item")
-    if (items) {
-      gsap.fromTo(
-        items,
-        {
-          y: 100,
-          opacity: 0,
-          scale: 0.8,
-          rotation: (index) => Math.random() * 20 - 10,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          rotation: 0,
-          duration: 0.8,
-          stagger: 0.1,
-          ease: "elastic.out(1, 0.5)",
-        },
-      )
-    }
-
-    const header = portfolioRef.current?.querySelector(".portfolio-header")
-    if (header) {
-      gsap.fromTo(header, { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" })
-    }
-  }, [])
-
-  return (
-    <div ref={portfolioRef} className="space-y-8">
-      <div className="portfolio-header flex items-center gap-4 mb-8">
-        <button
-          onClick={onBack}
-          className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition-all duration-300 hover:scale-110 transform"
-        >
-          <ArrowLeft className="w-6 h-6 text-white" />
-        </button>
-        <div>
-          <h2 className="text-4xl md:text-6xl font-bold">{company.name}</h2>
-          <p className="text-gray-400 mt-2">{company.description}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-        {company.works.map((work, index) => (
-          <div
-            key={work.id}
-            className="portfolio-item group bg-gray-900/50 rounded-lg overflow-hidden border border-gray-800 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 transform"
-          >
-            <div className="aspect-video overflow-hidden">
-              <img
-                src={work.image || "/placeholder.svg"}
-                alt={work.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-            </div>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-purple-400 font-medium">{work.category}</span>
-              </div>
-              <h3 className="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors duration-300">
-                {work.title}
-              </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{work.description}</p>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   )
