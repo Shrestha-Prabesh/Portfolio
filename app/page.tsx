@@ -376,7 +376,7 @@ export default function Home() {
               title="Shreya Auto"
               description="Developed as my university final year project. A comprehensive platform for vehicle reconditioning, including buying, selling, renting, and lost & found features, with Google login and Khalti payment integration."
               year="2025"
-              link="https://github.com/Shrestha-Prabesh/ShreyaAuto"
+              link="https://shreya.sthaprabesh.com.np/"
               onClick={handleProjectClick}
             />
             <WorkItem
