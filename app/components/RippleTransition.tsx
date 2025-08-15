@@ -55,7 +55,7 @@ export default function RippleTransition({ isActive, isInitializing = false, isC
         })
       }
     }
-  }, [isActive, isClosing, x, y, isInitializing])
+  }, [isActive, isClosing, x, y, isInitializing, onComplete])
 
   return (
     <div 

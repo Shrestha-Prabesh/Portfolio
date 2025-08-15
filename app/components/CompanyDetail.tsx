@@ -1,6 +1,7 @@
-import { ArrowLeft } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { ArrowLeft, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
+import Image from 'next/image'
 import CircularGallery from './CircularGallery'
 
 interface CompanyWork {
@@ -31,6 +32,7 @@ export default function CompanyDetail({
   isClosing,
 }: CompanyDetailProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [previewImage, setPreviewImage] = useState<{ image: string; title: string } | null>(null)
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
@@ -53,6 +55,25 @@ export default function CompanyDetail({
 
   const handleCloseClick = () => {
     onClose()
+  }
+
+  const handleImageClick = (image: string, title: string) => {
+    setPreviewImage({ image, title })
+  }
+
+  const handleClosePreview = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    setPreviewImage(null)
+  }
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking on the backdrop itself, not on child elements
+    if (e.target === e.currentTarget) {
+      handleClosePreview(e)
+    }
   }
 
   const galleryItems = company.works.map((work) => ({
@@ -91,10 +112,43 @@ export default function CompanyDetail({
               borderRadius={0.05} 
               scrollEase={0.02} 
               font="bold 30px system-ui, -apple-system, sans-serif"
+              onImageClick={handleImageClick}
             />
           </div>
         </div>
       </div>
+
+      {/* Full-screen image preview modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-[60] bg-black bg-opacity-90 flex items-center justify-center cursor-pointer"
+          onClick={handleBackdropClick}
+        >
+          <button
+            onClick={(e) => handleClosePreview(e)}
+            className="absolute top-8 right-8 text-white hover:text-gray-300 transition-colors z-[61] cursor-pointer"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          
+          <div 
+            className="max-w-[90vw] max-h-[90vh] flex flex-col items-center cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={previewImage.image}
+              alt={previewImage.title}
+              width={800}
+              height={600}
+              className="max-w-full max-h-[80vh] object-contain cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <h3 className="text-white text-xl font-bold mt-4 text-center cursor-default">
+              {previewImage.title}
+            </h3>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

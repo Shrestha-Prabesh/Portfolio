@@ -5,9 +5,9 @@ import { useEffect, useRef } from "react"
 
 type GL = Renderer["gl"]
 
-function debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
+function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
   let timeout: number
-  return function (this: any, ...args: Parameters<T>) {
+  return function (this: unknown, ...args: Parameters<T>) {
     window.clearTimeout(timeout)
     timeout = window.setTimeout(() => func.apply(this, args), wait)
   }
@@ -17,11 +17,11 @@ function lerp(p1: number, p2: number, t: number): number {
   return p1 + (p2 - p1) * t
 }
 
-function autoBind(instance: any): void {
+function autoBind(instance: object): void {
   const proto = Object.getPrototypeOf(instance)
   Object.getOwnPropertyNames(proto).forEach((key) => {
-    if (key !== "constructor" && typeof instance[key] === "function") {
-      instance[key] = instance[key].bind(instance)
+    if (key !== "constructor" && typeof (instance as Record<string, unknown>)[key] === "function") {
+      ;(instance as Record<string, unknown>)[key] = ((instance as Record<string, unknown>)[key] as (...args: unknown[]) => unknown).bind(instance)
     }
   })
 }
@@ -154,6 +154,7 @@ interface MediaProps {
   textColor: string
   borderRadius?: number
   font?: string
+  onImageClick?: (image: string, title: string) => void
 }
 
 class Media {
@@ -172,6 +173,7 @@ class Media {
   textColor: string
   borderRadius: number
   font?: string
+  onImageClick?: (image: string, title: string) => void
   program!: Program
   plane!: Mesh
   title!: Title
@@ -199,6 +201,7 @@ class Media {
     textColor,
     borderRadius = 0,
     font,
+    onImageClick,
   }: MediaProps) {
     this.geometry = geometry
     this.gl = gl
@@ -214,6 +217,7 @@ class Media {
     this.textColor = textColor
     this.borderRadius = borderRadius
     this.font = font
+    this.onImageClick = onImageClick
     this.createShader()
     this.createMesh()
     this.createTitle()
@@ -383,6 +387,7 @@ interface AppConfig {
   font?: string
   scrollSpeed?: number
   scrollEase?: number
+  onImageClick?: (image: string, title: string) => void
 }
 
 class App {
@@ -395,7 +400,8 @@ class App {
     last: number
     position?: number
   }
-  onCheckDebounce: (...args: any[]) => void
+  onCheckDebounce: (...args: unknown[]) => void
+  onImageClick?: (image: string, title: string) => void
   renderer!: Renderer
   gl!: GL
   camera!: Camera
@@ -412,6 +418,7 @@ class App {
   boundOnTouchDown!: (e: MouseEvent | TouchEvent) => void
   boundOnTouchMove!: (e: MouseEvent | TouchEvent) => void
   boundOnTouchUp!: () => void
+  boundOnClick!: (e: MouseEvent) => void
 
   isDown = false
   start = 0
@@ -426,12 +433,14 @@ class App {
       font = "bold 30px Figtree",
       scrollSpeed = 2,
       scrollEase = 0.05,
+      onImageClick,
     }: AppConfig,
   ) {
     document.documentElement.classList.remove("no-js")
     this.container = container
     this.scrollSpeed = scrollSpeed
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 }
+    this.onImageClick = onImageClick
     this.onCheckDebounce = debounce(this.onCheck.bind(this), 200)
     this.createRenderer()
     this.createCamera()
@@ -546,6 +555,7 @@ class App {
         textColor,
         borderRadius,
         font,
+        onImageClick: this.onImageClick,
       })
     })
   }
@@ -568,9 +578,40 @@ class App {
     this.onCheck()
   }
 
+  onClick(e: MouseEvent) {
+    if (!this.onImageClick || this.isDown) return
+    
+    // Get canvas bounds and click position
+    const canvas = this.renderer.gl.canvas as HTMLCanvasElement
+    const rect = canvas.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    
+    // Convert to normalized coordinates (-1 to 1)
+    const normalizedX = (x / rect.width) * 2 - 1
+    
+    // Find which media is closest to the center and clicked
+    let closestMedia: Media | null = null
+    let minDistance = Infinity
+    
+    for (const media of this.medias) {
+      // Calculate media position in normalized coordinates
+      const mediaX = media.plane.position.x / (this.viewport.width / 2)
+      const distance = Math.abs(mediaX - normalizedX)
+      
+      if (distance < minDistance && distance < 0.5) { // Within clickable range
+        minDistance = distance
+        closestMedia = media
+      }
+    }
+    
+    if (closestMedia && this.onImageClick) {
+      this.onImageClick(closestMedia.image, closestMedia.text)
+    }
+  }
+
   onWheel(e: Event) {
     const wheelEvent = e as WheelEvent
-    const delta = wheelEvent.deltaY || (wheelEvent as any).wheelDelta || (wheelEvent as any).detail
+    const delta = wheelEvent.deltaY || (wheelEvent as WheelEvent & { wheelDelta?: number }).wheelDelta || (wheelEvent as WheelEvent & { detail?: number }).detail
     this.scroll.target += (delta > 0 ? this.scrollSpeed : -this.scrollSpeed) * 0.2
     this.onCheckDebounce()
   }
@@ -618,12 +659,14 @@ class App {
     this.boundOnTouchDown = this.onTouchDown.bind(this)
     this.boundOnTouchMove = this.onTouchMove.bind(this)
     this.boundOnTouchUp = this.onTouchUp.bind(this)
+    this.boundOnClick = this.onClick.bind(this)
     window.addEventListener("resize", this.boundOnResize)
     window.addEventListener("mousewheel", this.boundOnWheel)
     window.addEventListener("wheel", this.boundOnWheel)
     window.addEventListener("mousedown", this.boundOnTouchDown)
     window.addEventListener("mousemove", this.boundOnTouchMove)
     window.addEventListener("mouseup", this.boundOnTouchUp)
+    window.addEventListener("click", this.boundOnClick)
     window.addEventListener("touchstart", this.boundOnTouchDown)
     window.addEventListener("touchmove", this.boundOnTouchMove)
     window.addEventListener("touchend", this.boundOnTouchUp)
@@ -637,6 +680,7 @@ class App {
     window.removeEventListener("mousedown", this.boundOnTouchDown)
     window.removeEventListener("mousemove", this.boundOnTouchMove)
     window.removeEventListener("mouseup", this.boundOnTouchUp)
+    window.removeEventListener("click", this.boundOnClick)
     window.removeEventListener("touchstart", this.boundOnTouchDown)
     window.removeEventListener("touchmove", this.boundOnTouchMove)
     window.removeEventListener("touchend", this.boundOnTouchUp)
@@ -654,6 +698,7 @@ interface CircularGalleryProps {
   font?: string
   scrollSpeed?: number
   scrollEase?: number
+  onImageClick?: (image: string, title: string) => void
 }
 
 export default function CircularGallery({
@@ -664,6 +709,7 @@ export default function CircularGallery({
   font = "bold 30px Figtree",
   scrollSpeed = 2,
   scrollEase = 0.05,
+  onImageClick,
 }: CircularGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -676,10 +722,11 @@ export default function CircularGallery({
       font,
       scrollSpeed,
       scrollEase,
+      onImageClick,
     })
     return () => {
       app.destroy()
     }
-  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase])
+  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase, onImageClick])
   return <div className="w-full h-full cursor-grab active:cursor-grabbing z-10" ref={containerRef} />
 }

@@ -5,15 +5,12 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ArrowRight, Code2, Database, Cpu, Code, ArrowLeft } from "lucide-react"
+import { ArrowRight, Code2, Database, Cpu, Code } from "lucide-react"
 import RippleTransition from "./components/RippleTransition"
 import ProjectDetail from "./components/ProjectDetail"
 import CompanyDetail from "./components/CompanyDetail"
 import InitializationScreen from "./components/InitializationScreen"
 import ContactForm from "./components/ContactForm"
-import CircularGallery from "./components/CircularGallery"
-import Test1 from "../public/test.png"
-
 gsap.registerPlugin(ScrollTrigger)
 
 interface ProjectClickPosition {
@@ -64,28 +61,49 @@ export default function Home() {
           id: "ac1",
           title: "Instagram Story Templates",
           description: "Designed engaging story templates for product promotions and brand awareness campaigns",
-          image: "/test.png",
+          image: "/img1.png",
           category: "Social Media",
         },
         {
           id: "ac2",
           title: "Facebook Ad Campaigns",
           description: "Created compelling ad visuals for Facebook marketing campaigns targeting tech enthusiasts",
-          image: "/test.png",
+          image: "/img2.png",
           category: "Advertising",
         },
         {
           id: "ac3",
           title: "Product Showcase Posts",
           description: "Designed clean and modern product showcase posts highlighting AirCharge features",
-          image: "/test.png",
+          image: "/img3.png",
           category: "Product Design",
         },
         {
           id: "ac4",
           title: "Brand Identity Elements",
           description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
-         image: "/test.png",
+         image: "/img5.png",
+          category: "Branding",
+        },
+        {
+          id: "ac5",
+          title: "Brand Identity Elements",
+          description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
+         image: "/img6.png",
+          category: "Branding",
+        },
+        {
+          id: "ac6",
+          title: "Brand Identity Elements",
+          description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
+         image: "/img7.png",
+          category: "Branding",
+        },
+        {
+          id: "ac7",
+          title: "Brand Identity Elements",
+          description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
+         image: "/img8.png",
           category: "Branding",
         },
       ],
