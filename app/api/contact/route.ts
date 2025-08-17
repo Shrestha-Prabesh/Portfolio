@@ -13,14 +13,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if environment variables are set
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error('Email configuration missing:', {
+        EMAIL_USER: !!process.env.EMAIL_USER,
+        EMAIL_PASS: !!process.env.EMAIL_PASS
+      })
+      return NextResponse.json(
+        { error: 'Email configuration not set up' },
+        { status: 500 }
+      )
+    }
+
     // Create transporter
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // You can change this to your preferred email service
+      service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER, // Your email
-        pass: process.env.EMAIL_PASS, // Your email password or app password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
+      // Add additional options for better reliability
+      pool: true,
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      requireTLS: true,
     })
+
+    // Test the connection
+    try {
+      await transporter.verify()
+      console.log('Email transporter verified successfully')
+    } catch (verifyError) {
+      console.error('Email transporter verification failed:', verifyError)
+      return NextResponse.json(
+        { error: 'Email service configuration error' },
+        { status: 500 }
+      )
+    }
 
     // Email options
     const mailOptions = {
@@ -45,16 +75,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Send email
-    await transporter.sendMail(mailOptions)
+    const result = await transporter.sendMail(mailOptions)
+    console.log('Email sent successfully:', result.messageId)
 
     return NextResponse.json(
       { message: 'Email sent successfully' },
       { status: 200 }
     )
   } catch (error) {
-    console.error('Error sending email:', error)
+    console.error('Detailed error sending email:', {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    })
     return NextResponse.json(
-      { error: 'Failed to send email' },
+      { error: 'Failed to send email', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

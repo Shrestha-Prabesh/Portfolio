@@ -6,10 +6,12 @@ import { Github, Linkedin } from 'lucide-react'
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
 
     const form = e.target as HTMLFormElement
     const formData = new FormData(form)
@@ -39,12 +41,12 @@ export default function ContactForm() {
         const errorData = await response.json()
         console.error('Error sending email:', errorData.error)
         setIsSubmitting(false)
-        alert('Failed to send message. Please try again.')
+        setError(errorData.details || errorData.error || 'Failed to send message. Please try again.')
       }
     } catch (error) {
       console.error('Error sending email:', error)
       setIsSubmitting(false)
-      alert('Failed to send message. Please try again.')
+      setError('Network error. Please check your connection and try again.')
     }
   }
 
@@ -55,6 +57,11 @@ export default function ContactForm() {
         <p className="text-green-500">Thank you for your message. I&apos;ll get back to you soon!</p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 bg-red-900/50 border border-red-500 rounded-md">
+              <p className="text-red-300 text-sm">{error}</p>
+            </div>
+          )}
           <input
             type="text"
             name="name"
@@ -78,7 +85,7 @@ export default function ContactForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full p-2 bg-gray-900 text-white font-bold rounded-md hover:bg-gray-700 focus:outline-none"
+            className="w-full p-2 bg-gray-900 text-white font-bold rounded-md hover:bg-gray-700 focus:outline-none disabled:opacity-50"
           >
             {isSubmitting ? 'Sending...' : 'Send Message'}
           </button>
