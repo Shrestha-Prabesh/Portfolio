@@ -32,7 +32,24 @@ export default function CompanyDetail({
   isClosing,
 }: CompanyDetailProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [previewImage, setPreviewImage] = useState<{ image: string; title: string } | null>(null)
+  const [previewImage, setPreviewImage] = useState<{ 
+    image: string; 
+    title: string; 
+    description: string; 
+    category: string;
+  } | null>(null)
+
+  // Reset preview when component mounts or company changes
+  useEffect(() => {
+    setPreviewImage(null)
+  }, [company])
+
+  // Additional reset when component becomes visible
+  useEffect(() => {
+    if (isVisible && !isClosing) {
+      setPreviewImage(null)
+    }
+  }, [isVisible, isClosing])
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
@@ -58,7 +75,19 @@ export default function CompanyDetail({
   }
 
   const handleImageClick = (image: string, title: string) => {
-    setPreviewImage({ image, title })
+    // Only allow image clicks when the component is fully visible and not closing
+    if (!isVisible || isClosing) return
+    
+    // Find the full work details
+    const work = company.works.find(work => work.title === title)
+    if (work) {
+      setPreviewImage({ 
+        image, 
+        title, 
+        description: work.description,
+        category: work.category
+      })
+    }
   }
 
   const handleClosePreview = (e?: React.MouseEvent) => {
@@ -140,12 +169,18 @@ export default function CompanyDetail({
               alt={previewImage.title}
               width={800}
               height={600}
-              className="max-w-full max-h-[80vh] object-contain cursor-default"
+              className="max-w-full max-h-[70vh] object-contain cursor-default"
               onClick={(e) => e.stopPropagation()}
             />
-            <h3 className="text-white text-xl font-bold mt-4 text-center cursor-default">
-              {previewImage.title}
-            </h3>
+            <div className="text-center mt-6 max-w-2xl">
+              <div className="text-purple-400 text-sm font-medium mb-2">{previewImage.category}</div>
+              <h3 className="text-white text-2xl font-bold mb-3">
+                {previewImage.title}
+              </h3>
+              <p className="text-gray-300 text-lg leading-relaxed">
+                {previewImage.description}
+              </p>
+            </div>
           </div>
         </div>
       )}
