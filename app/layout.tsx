@@ -10,7 +10,6 @@ export const metadata = {
   description: 'My portfolio showcasing web development skills and projects.',
   author: 'Prabesh Shrestha',
   keywords: 'web development, portfolio, React, Next.js, frontend, full-stack developer, software engineer',
-  viewport: 'width=device-width, initial-scale=1',
   openGraph: {
     title: 'Prabesh Shrestha Portfolio',
     description: 'Discover the projects and skills of Prabesh Shrestha, a web developer specializing in React, Next.js, and full-stack development.',
@@ -25,6 +24,11 @@ export const metadata = {
     description: 'Explore my portfolio to learn more about my web development projects and skills.',
     image: 'https://www.prabeshshrestha.com/og-image.jpg',
   },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
