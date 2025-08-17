@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       EMAIL_PASS: process.env.EMAIL_PASS ? 'Set' : 'Missing',
       NODE_ENV: process.env.NODE_ENV,
       ALL_ENV: Object.keys(process.env).filter(key => key.includes('EMAIL'))
-    })
+    });
     
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.error('Email configuration missing:', {
