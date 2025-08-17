@@ -14,10 +14,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if environment variables are set
+    console.log('Environment check:', {
+      EMAIL_USER: process.env.EMAIL_USER ? 'Set' : 'Missing',
+      EMAIL_PASS: process.env.EMAIL_PASS ? 'Set' : 'Missing',
+      NODE_ENV: process.env.NODE_ENV,
+      ALL_ENV: Object.keys(process.env).filter(key => key.includes('EMAIL'))
+    })
+    
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.error('Email configuration missing:', {
         EMAIL_USER: !!process.env.EMAIL_USER,
-        EMAIL_PASS: !!process.env.EMAIL_PASS
+        EMAIL_PASS: !!process.env.EMAIL_PASS,
+        availableEnvKeys: Object.keys(process.env).filter(key => key.includes('EMAIL') || key.includes('MAIL'))
       })
       return NextResponse.json(
         { error: 'Email configuration not set up' },
