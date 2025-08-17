@@ -6,8 +6,6 @@ import CircularGallery from './CircularGallery'
 
 interface CompanyWork {
   id: string
-  title: string
-  description: string
   image?: string
   category: string
 }
@@ -32,12 +30,7 @@ export default function CompanyDetail({
   isClosing,
 }: CompanyDetailProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [previewImage, setPreviewImage] = useState<{ 
-    image: string; 
-    title: string; 
-    description: string; 
-    category: string;
-  } | null>(null)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
 
   // Reset preview when component mounts or company changes
   useEffect(() => {
@@ -74,20 +67,11 @@ export default function CompanyDetail({
     onClose()
   }
 
-  const handleImageClick = (image: string, title: string) => {
+  const handleImageClick = (image: string) => {
     // Only allow image clicks when the component is fully visible and not closing
     if (!isVisible || isClosing) return
     
-    // Find the full work details
-    const work = company.works.find(work => work.title === title)
-    if (work) {
-      setPreviewImage({ 
-        image, 
-        title, 
-        description: work.description,
-        category: work.category
-      })
-    }
+    setPreviewImage(image)
   }
 
   const handleClosePreview = (e?: React.MouseEvent) => {
@@ -107,7 +91,7 @@ export default function CompanyDetail({
 
   const galleryItems = company.works.map((work) => ({
     image: work.image || "/placeholder.svg?height=600&width=800",
-    text: work.title,
+    text: "", // No text since we removed titles
   }))
 
   return (
@@ -160,27 +144,18 @@ export default function CompanyDetail({
             <X className="w-8 h-8" />
           </button>
           
-          <div 
-            className="max-w-[90vw] max-h-[90vh] flex flex-col items-center cursor-default"
+                      <div 
+            className="max-w-[95vw] max-h-[95vh] flex flex-col items-center cursor-default"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={previewImage.image}
-              alt={previewImage.title}
-              width={800}
-              height={600}
-              className="max-w-full max-h-[70vh] object-contain cursor-default"
+              src={previewImage}
+              alt="Design work"
+              width={1200}
+              height={900}
+              className="max-w-full max-h-[85vh] object-contain cursor-default"
               onClick={(e) => e.stopPropagation()}
             />
-            <div className="text-center mt-6 max-w-2xl">
-              <div className="text-purple-400 text-sm font-medium mb-2">{previewImage.category}</div>
-              <h3 className="text-white text-2xl font-bold mb-3">
-                {previewImage.title}
-              </h3>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                {previewImage.description}
-              </p>
-            </div>
           </div>
         </div>
       )}

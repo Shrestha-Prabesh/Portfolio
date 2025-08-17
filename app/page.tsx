@@ -20,8 +20,6 @@ interface ProjectClickPosition {
 
 interface CompanyWork {
   id: string
-  title: string
-  description: string
   image?: string
   category: string
 }
@@ -59,51 +57,42 @@ export default function Home() {
       works: [
         {
           id: "ac1",
-          title: "Instagram Story Templates",
-          description: "Designed engaging story templates for product promotions and brand awareness campaigns",
           image: "/img1.png",
           category: "Social Media",
         },
         {
           id: "ac2",
-          title: "Facebook Ad Campaigns",
-          description: "Created compelling ad visuals for Facebook marketing campaigns targeting tech enthusiasts",
           image: "/img2.png",
           category: "Advertising",
         },
         {
           id: "ac3",
-          title: "Product Showcase Posts",
-          description: "Designed clean and modern product showcase posts highlighting AirCharge features",
           image: "/img3.png",
           category: "Product Design",
         },
         {
           id: "ac4",
-          title: "Brand Identity Elements",
-          description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
          image: "/img5.png",
           category: "Branding",
         },
         {
           id: "ac5",
-          title: "Brand Identity Elements",
-          description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
          image: "/img6.png",
           category: "Branding",
         },
         {
           id: "ac6",
-          title: "Brand Identity Elements",
-          description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
          image: "/img7.png",
           category: "Branding",
         },
         {
           id: "ac7",
-          title: "Brand Identity Elements",
-          description: "Created consistent brand elements including logos, color schemes, and typography guidelines",
          image: "/img8.png",
+          category: "Branding",
+        },
+        {
+          id: "ac8",
+         image: "/ac8.png",
           category: "Branding",
         },
       ],
@@ -114,30 +103,21 @@ export default function Home() {
       works: [
         {
           id: "an1",
-          title: "Product Magazine Layout",
-          description:
-            "Designed comprehensive product catalogs showcasing Avani Nepal's offerings with elegant layouts",
           image: "/a1.png",
           category: "Print Design",
         },
         {
           id: "an2",
-          title: "Social Media Campaign",
-          description: "Created cohesive social media posts for Instagram and Facebook promoting Avani Nepal products",
           image: "/a2.png",
           category: "Social Media",
         },
         {
           id: "an3",
-          title: "Marketing Brochures",
-          description: "Designed informative brochures highlighting product features and company values",
           image: "/a3.png",
           category: "Print Design",
         },
         {
           id: "an4",
-          title: "Digital Advertisements",
-          description: "Created eye-catching digital ads for online platforms and email marketing campaigns",
           image: "/a4.png",
           category: "Digital Marketing",
         },
@@ -150,50 +130,36 @@ export default function Home() {
       works: [
         {
           id: "tbc1",
-          title: "College Admission Booklet",
-          description: "Designed comprehensive admission booklets with course information and campus highlights",
           image: "/b1.png",
           category: "Educational Design",
         },
         {
           id: "tbc2",
-          title: "Event Promotion Materials",
-          description: "Created promotional materials for college events, seminars, and workshops",
           image: "/b2.png",
           category: "Event Design",
         },
         {
           id: "tbc3",
-          title: "Social Media Content",
-          description: "Designed engaging social media posts for student recruitment and college updates",
           image: "/b3.png",
           category: "Social Media",
         },
         {
           id: "tbc4",
-          title: "Academic Brochures",
-          description: "Created informative brochures for different academic programs and departments",
           image: "/b4.png",
           category: "Educational Design",
         },
         {
           id: "tbc5",
-          title: "Academic Brochures",
-          description: "Created informative brochures for different academic programs and departments",
           image: "/b5.png",
           category: "Educational Design",
         },
         {
           id: "tbc6",
-          title: "Academic Brochures",
-          description: "Created informative brochures for different academic programs and departments",
           image: "/b6.png",
           category: "Educational Design",
         },
         {
           id: "tbc7",
-          title: "Academic Brochures",
-          description: "Created informative brochures for different academic programs and departments",
           image: "/b7.png",
           category: "Educational Design",
         },
