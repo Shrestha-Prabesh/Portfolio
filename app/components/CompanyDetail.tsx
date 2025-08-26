@@ -44,6 +44,33 @@ export default function CompanyDetail({
     }
   }, [isVisible, isClosing])
 
+  // Prevent background scrolling when component is visible
+  useEffect(() => {
+    if (isVisible && !isClosing) {
+      // Disable scrolling on body
+      document.body.style.overflow = 'hidden'
+      return () => {
+        // Re-enable scrolling when component unmounts or becomes hidden
+        document.body.style.overflow = 'unset'
+      }
+    } else {
+      // Re-enable scrolling when component is closing or not visible
+      document.body.style.overflow = 'unset'
+    }
+  }, [isVisible, isClosing])
+
+  // Additional effect to prevent scrolling when preview image is open
+  useEffect(() => {
+    if (previewImage) {
+      // Disable scrolling when preview is open
+      document.body.style.overflow = 'hidden'
+      return () => {
+        // Re-enable scrolling when preview closes
+        document.body.style.overflow = 'unset'
+      }
+    }
+  }, [previewImage])
+
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
