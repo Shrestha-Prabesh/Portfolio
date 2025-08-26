@@ -12,18 +12,18 @@ export const metadata = {
   keywords: 'web development, portfolio, React, Next.js, frontend, full-stack developer, software engineer',
   openGraph: {
     title: 'Prabesh Shrestha Portfolio',
-    description: 'Discover the projects and skills of Prabesh Shrestha, a web developer specializing in React, Next.js, and full-stack development.',
-    url: 'https://www.prabeshshrestha.com.np',
-    image: 'https://www.prabeshshrestha.com/og-image.jpg',
-    site_name: 'Prabesh Shrestha Portfolio',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Prabesh Shrestha Portfolio',
-    description: 'Explore my portfolio to learn more about my web development projects and skills.',
-    image: 'https://www.prabeshshrestha.com/og-image.jpg',
-  },
+description: 'Portfolio of Prabesh Shrestha — Frontend Developer (React, Tailwind CSS) & Graphics Designer creating clean, modern web experiences.',
+url: 'https://www.prabeshshrestha.com.np',
+image: 'https://www.prabeshshrestha.com/og-image.jpg',
+site_name: 'Prabesh Shrestha Portfolio',
+type: 'website',
+},
+twitter: {
+  card: 'summary_large_image',
+  title: 'Prabesh Shrestha Portfolio',
+  description: 'Frontend Developer & Graphics Designer crafting clean, modern web experiences with React and Tailwind CSS.',
+  image: 'https://www.prabeshshrestha.com/og-image.jpg',
+},
 }
 
 export const viewport = {
