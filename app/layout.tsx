@@ -2,6 +2,7 @@ import Footer from './components/Footer'
 import './globals.css'
 import { Space_Grotesk } from 'next/font/google'
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] })
 
@@ -40,6 +41,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={spaceGrotesk.className}>
         <Analytics />
+        <SpeedInsights />
         {children}
         <Footer />
       </body>
