@@ -158,11 +158,6 @@ export default function Home() {
           image: "/b6.png",
           category: "Educational Design",
         },
-        {
-          id: "tbc7",
-          image: "/b7.png",
-          category: "Educational Design",
-        },
          {
           id: "tbc8",
           image: "/b8.png",
