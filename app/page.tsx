@@ -95,6 +95,16 @@ export default function Home() {
          image: "/ac8.png",
           category: "Branding",
         },
+         {
+          id: "ac9",
+         image: "/img9.png",
+          category: "Branding",
+        },
+         {
+          id: "ac10",
+         image: "/img10.png",
+          category: "Branding",
+        },
       ],
     },
     {
