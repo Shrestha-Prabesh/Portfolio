@@ -105,6 +105,11 @@ export default function Home() {
          image: "/img10.png",
           category: "Branding",
         },
+         {
+          id: "ac11",
+         image: "/img11.png",
+          category: "Branding",
+        },
       ],
     },
     {
