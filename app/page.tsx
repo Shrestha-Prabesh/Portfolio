@@ -5,7 +5,7 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ArrowRight, Code2, Database, Cpu, Code } from "lucide-react"
+import { ArrowRight, Code2, PenTool, Smartphone, Users, Video} from "lucide-react"
 import RippleTransition from "./components/RippleTransition"
 import ProjectDetail from "./components/ProjectDetail"
 import CompanyDetail from "./components/CompanyDetail"
@@ -72,6 +72,11 @@ export default function Home() {
         },
         {
           id: "ac4",
+          image: "/img4.png",
+          category: "Product Design",
+        },
+        {
+          id: "ac4",
          image: "/img5.png",
           category: "Branding",
         },
@@ -108,6 +113,11 @@ export default function Home() {
          {
           id: "ac11",
          image: "/img11.png",
+          category: "Branding",
+        },
+         {
+          id: "ac12",
+         image: "/img12.png",
           category: "Branding",
         },
       ],
@@ -324,12 +334,11 @@ export default function Home() {
           <div className="max-w-3xl">
             <h1 ref={headingRef} className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8">
               <span className="block">I craft</span>
-              <span className="block text-stroke text-transparent">Digital Experiences</span>
-              <span className="block">& Visual Stories</span>
+              <span className="block text-stroke text-transparent">Creative Visuals</span>
+              <span className="block">& Clean Interfaces</span>
             </h1>
             <p ref={subheadingRef} className="text-xl md:text-2xl text-gray-400 max-w-2xl">
-              Frontend Developer & Graphic Designer creating seamless digital experiences through code and creative
-              design
+              Graphic Designer creating clean, engaging digital experiences with design and code.
             </p>
           </div>
         </div>
@@ -346,26 +355,34 @@ export default function Home() {
           <div className="h-1 w-24 bg-purple-500 mb-16"></div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+           
             <SkillCard
-              icon={<Code2 className="w-8 h-8 text-purple-500" />}
-              title="Frontend Development"
-              description="Developing responsive and high-performance user interfaces with React, Next.js, and modern web standards."
-            />
-            <SkillCard
-              icon={<Database className="w-8 h-8 text-purple-500" />}
-              title="Graphic & UI/UX Design"
-              description="Designing visually appealing and user-friendly interfaces with tools like Adobe Photoshop, Illustrator, Figma, and Canva."
-            />
-            <SkillCard
-              icon={<Cpu className="w-8 h-8 text-purple-500" />}
-              title="Responsive Design"
-              description="Creating mobile-friendly layouts with Flexbox, CSS Grid, and Tailwind CSS to ensure compatibility across devices."
-            />
-            <SkillCard
-              icon={<Code className="w-8 h-8 text-purple-500" />}
-              title="Collaborative Design"
-              description="Working with design tools like Figma to create and implement modern, developer-friendly UI components."
-            />
+  icon={<PenTool className="w-8 h-8 text-purple-500" />}
+  title="Graphic & UI/UX Design"
+  description="Designing visually appealing and user-friendly interfaces with tools like Adobe Illustrator, Photoshop, InDesign, Figma, and Canva."
+/>
+<SkillCard
+  icon={<Smartphone className="w-8 h-8 text-purple-500" />}
+  title="Responsive Design"
+  description="Creating mobile-friendly layouts with Flexbox, CSS Grid, and Tailwind CSS to ensure compatibility across devices."
+/>
+<SkillCard
+  icon={<Users className="w-8 h-8 text-purple-500" />}
+  title="Collaborative Design"
+  description="Working with design tools like Figma to create and implement modern, developer-friendly UI components."
+/>
+<SkillCard
+  icon={<Code2 className="w-8 h-8 text-purple-500" />}
+  title="Frontend Development"
+  description="Developing responsive and high-performance user interfaces with React, Next.js, and modern web standards."
+/>
+<SkillCard
+  icon={<Video className="w-8 h-8 text-purple-500" />}
+  title="Video Editing"
+  description="Creating engaging and polished videos using Canva and CapCut for social media and digital content."
+/>
+
+
           </div>
         </div>
       </section>
@@ -431,7 +448,7 @@ export default function Home() {
             <div className="space-y-6">
               <div className="space-y-6 text-xl text-gray-400">
                 <p>
-                  I design with the eye of an artist and develop with the mind of an engineer, so the web gets the best
+                  I design with the eye of an artist and develop with the mind of an engineer, so the product gets the best
                   of both worlds.{" "}
                   <span
                     onClick={toggleSpoiler}
